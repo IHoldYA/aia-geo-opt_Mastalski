@@ -221,7 +221,7 @@ for i in range(0, m_U):
 m_p_mesh_test.Normals.ComputeNormals()
 m_p_mesh_test.Compact()
 
-print(m_p_mesh_test)
+# print(m_p_mesh_test)
 
 #for i in m_plines:
 #    for j in i:
