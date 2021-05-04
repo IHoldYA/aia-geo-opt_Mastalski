@@ -7,6 +7,8 @@
         b: List of Points
         c: list of angles
         d: exploded mesh
+        e: rotated meshes - using variables[c, a, b]
+        f: rotated & scaled meshes - using variables[c, (rotated to vector perpendicular to sun and var a), b]
         """
         
 import Rhino.Geometry as rg
@@ -51,6 +53,8 @@ d = []
 
 # d = m.Faces.GetFaceVertices(0)[1:]
 
+# a little different method then asked in pseudo code:
+
 for i in range(m.Faces.Count):
     m_t = rg.Mesh()
     m_v = m.Faces.GetFaceVertices(i)[1:] #slice to get rid of the boolean
@@ -61,14 +65,44 @@ for i in range(m.Faces.Count):
     m_t.Compact()
     d.append(m_t)
 
-
-# for i in range(m.Faces.Count):
-#     m_t = rg.Mesh()
-#     m_t.Faces.AddFace(m.Faces.GetFace(i))
-#     d.append(m_t)
-
 # print(d)
 #after here, your task is to apply a transformation to each face of the mesh
 #the transformation should correspond to the angle value that corresponds that face to it... 
 #the result should be a mesh that responds to the sun position... its up to you!
 
+# rotate panels based on previously acquired variables:
+
+def dup_mesh(mesh):
+    msh = []
+    for i in mesh: 
+        msh.append(i.DuplicateMesh())
+    return msh
+
+e = dup_mesh(d)
+
+for i in range(len(e)):
+    e[i].Rotate(c[i], a[i], b[i])
+    
+#rotate panels using perpendicular
+
+f = dup_mesh(d)
+
+# def reMap to scale panels based on angle between face normal and sun later:
+
+def reMap(value, maxInput, minInput, maxOutput, minOutput):
+
+	value = maxInput if value > maxInput else value
+	value = minInput if value < minInput else value
+
+	inputSpan = maxInput - minInput
+	outputSpan = maxOutput - minOutput
+
+	scaledThrust = float(value - minInput) / float(inputSpan)
+
+	return minOutput + (scaledThrust * outputSpan)
+
+
+for i in range(len(f)):
+    f[i].Rotate(c[i], rg.Vector3d.CrossProduct(a[i], s), b[i])
+    trans = rg.Transform.Scale(b[i], reMap(c[i], max(c), min(c), 0.2, 0.9))
+    f[i].Transform(trans)
