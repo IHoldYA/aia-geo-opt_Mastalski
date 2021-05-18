@@ -104,5 +104,7 @@ def reMap(value, maxInput, minInput, maxOutput, minOutput):
 
 for i in range(len(f)):
     f[i].Rotate(c[i], rg.Vector3d.CrossProduct(a[i], s), b[i])
-    trans = rg.Transform.Scale(b[i], reMap(c[i], max(c), min(c), 0.2, 0.9))
+    trans = rg.Transform.Scale(b[i], reMap(c[i], max(c), min(c), 0.9, 0.4))
     f[i].Transform(trans)
+
+
